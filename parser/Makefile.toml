@@ -43,6 +43,7 @@
   ]
 
 [tasks."cpp:headers"]
+  env     = { RUSTC_BOOTSTRAP = "1" }
   command = "cbindgen"
   args    = ["--quiet", "--output", "target/headers/milo.h"]
 
