@@ -48,11 +48,11 @@
   args    = ["--quiet", "--output", "target/headers/milo.h"]
 
 [tasks."wasm:release"]
-  env      = { CONFIGURATION = "release", CARGO_BUILD_OPTIONS = "", CARGO_OPTIONS = "--release", RUSTFLAGS_BASE = "-C panic=abort", WASMPACK_OPTIONS = "--release" }
+  env      = { CONFIGURATION = "release", CARGO_OPTIONS = "--release", RUSTFLAGS_BASE = "-C panic=abort", WASMPACK_OPTIONS = "--release" }
   run_task = "wasm:module"
 
 [tasks."wasm:debug"]
-  env      = { CONFIGURATION = "debug", CARGO_BUILD_OPTIONS = "", CARGO_OPTIONS = "--release --features debug", RUSTFLAGS_BASE = "", WASMPACK_OPTIONS = "--release" }
+  env      = { CONFIGURATION = "debug", CARGO_OPTIONS = "--release --features debug", RUSTFLAGS_BASE = "", WASMPACK_OPTIONS = "--release" }
   run_task = "wasm:module"
 
 [tasks."wasm:module"]
