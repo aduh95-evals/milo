@@ -20,8 +20,6 @@
   command = "cargo"
   args = [
     "build",
-    "-Z",
-    "unstable-options",
     "--target",
     "${TARGET}",
     "--target-dir",
@@ -35,8 +33,6 @@
   command = "cargo"
   args = [
     "build",
-    "-Z",
-    "unstable-options",
     "--target",
     "${TARGET}",
     "--target-dir",
