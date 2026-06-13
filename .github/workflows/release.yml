@@ -54,11 +54,6 @@ jobs:
             parser/target
             macros/target
           key: cargo-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/Cargo.lock') }}
-      - name: Restore cached dependencies (PNPM)
-        uses: actions/cache@v3
-        with:
-          path: ~/.pnpm-store
-          key: release-node-${{ hashFiles('package.json') }}-${{ hashFiles('pnpm-lock.yaml') }}
       - name: Install makers
         uses: taiki-e/cache-cargo-install-action@v3
         with:
@@ -67,12 +62,6 @@ jobs:
         uses: taiki-e/cache-cargo-install-action@v3
         with:
           tool: cbindgen
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: latest
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
       - name: Download latest cambi
         shell: bash
         run: |
@@ -213,11 +202,6 @@ jobs:
             parser/target
             macros/target
           key: cargo-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/Cargo.lock') }}
-      - name: Restore cached dependencies (PNPM)
-        uses: actions/cache@v3
-        with:
-          path: ~/.pnpm-store
-          key: release-node-${{ hashFiles('package.json') }}-${{ hashFiles('pnpm-lock.yaml') }}
       - name: Install makers
         run: |
           ARCH=x86_64-unknown-linux-gnu
@@ -233,12 +217,6 @@ jobs:
         uses: taiki-e/cache-cargo-install-action@v3
         with:
           tool: cbindgen
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: latest
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
       - name: Download latest cambi
         run: |
           mkdir -p /tmp/cambi-bootstrap
@@ -281,7 +259,7 @@ jobs:
           mv /tmp/artifacts/milo-parser-bin-macos-intel/milo-parser-bin-macos-intel.tar.gz /tmp/release/
       - name: Push release commit and tag
         run: |
-          git add -f package.json CHANGELOG.md parser/Cargo.toml parser/Cargo.lock macros/Cargo.toml macros/Cargo.lock references/rust/Cargo.toml references/rust/Cargo.lock parser/src/wasm/package.json
+          git add -f CHANGELOG.md parser/Cargo.toml parser/Cargo.lock macros/Cargo.toml macros/Cargo.lock references/rust/Cargo.toml references/rust/Cargo.lock parser/src/wasm/package.json
           git commit -m "chore: Updated version."
           git tag -f "v${{ inputs.version }}"
       - name: Publish macros on crates.io
@@ -295,10 +273,10 @@ jobs:
         env:
           CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
       - name: Publish WASM ESM package on npm
-        run: pnpm publish --access public --tag ${{ inputs.prerelease == true && 'next' || 'latest' }} --provenance --no-git-checks
+        run: npm publish --access public --tag ${{ inputs.prerelease == true && 'next' || 'latest' }} --provenance
         working-directory: dist/wasm/release/package
       - name: Publish WASM CJS package on npm
-        run: pnpm publish --access public --tag ${{ inputs.prerelease == true && 'next' || 'latest' }} --provenance --no-git-checks
+        run: npm publish --access public --tag ${{ inputs.prerelease == true && 'next' || 'latest' }} --provenance
         working-directory: dist/wasm/release/package-cjs
       - name: Publish on GitHub
         run: |

@@ -11,10 +11,10 @@
   script = ["cd parser", "cargo test"]
 
 [tasks.format]
-  dependencies = ["format:rust", "format:js", "format:cpp"]
+  dependencies = ["format:rust", "format:cpp"]
 
 [tasks.lint]
-  dependencies = ["lint:rust", "lint:js"]
+  dependencies = ["lint:rust"]
 
 [tasks.clean]
   dependencies = ["clean:rust", "clean:dist", "clean:tmp"]
@@ -26,7 +26,7 @@
   dependencies = ["references:rust", "references:cpp", "references:wasm"]
 
 [tasks."llhttp:import"]
-  script = ["cd parser", "node ../scripts/import-llhttp-tests.js ${1} ."]
+  script = ["cd parser", "cargo run --example import_llhttp -- ${1}"]
 
 [tasks."llhttp:review"]
   script = ["cd parser", "cargo run --example llhttp -- --review ${1}"]
@@ -56,7 +56,7 @@
   args    = ["-rf", "tmp"]
 
 [tasks."lint:fix"]
-  dependencies = ["lint:rust:fix", "lint:js:fix"]
+  dependencies = ["lint:rust:fix"]
 
 [tasks."format:rust"]
   script = [
@@ -82,10 +82,6 @@
     "references/cpp/src/readme.cc",
   ]
 
-[tasks."format:js"]
-  command = "pnpm"
-  args    = ["run", "format"]
-
 [tasks."lint:rust"]
   script = [
     "cd macros",
@@ -105,14 +101,6 @@
     "cd ../references/rust",
     "cargo clippy --fix --allow-dirty",
   ]
-
-[tasks."lint:js"]
-  command = "pnpm"
-  args    = ["run", "lint"]
-
-[tasks."lint:js:fix"]
-  command = "pnpm"
-  args    = ["run", "lint", "--fix"]
 
 [tasks."benchmarks:cpp"]
   script = ["cd benchmarks/cpp", "makers benchmarks"]

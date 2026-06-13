@@ -247,12 +247,6 @@ Make sure you have the `wasm32-unknown-unknown` target:
 rustup target add wasm32-unknown-unknown
 ```
 
-Install npm dependencies
-
-```bash
-pnpm install
-```
-
 After all the requirements are met, you can then run:
 
 ```bash
