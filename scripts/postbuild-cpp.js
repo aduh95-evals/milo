@@ -1,5 +1,14 @@
+import { execFileSync } from 'node:child_process'
 import { readFile, writeFile } from 'node:fs/promises'
-import { getBuildInfo } from './buildinfo.js'
+import { fileURLToPath } from 'node:url'
+
+function getBuildInfo () {
+  const output = execFileSync(
+    'cargo', ['run', '--example', 'buildinfo'],
+    { cwd: fileURLToPath(new URL('../parser', import.meta.url)) }
+  )
+  return JSON.parse(output)
+}
 
 async function prependVersionAndMethodMap () {
   const headerMatcher = 'namespace milo_parser {'

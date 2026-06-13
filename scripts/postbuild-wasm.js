@@ -1,9 +1,15 @@
+import { execFileSync } from 'node:child_process'
 import { cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { format } from 'prettier'
-import prettierConfig from '../prettier.config.js'
-import { getBuildInfo } from './buildinfo.js'
+
+function getBuildInfo () {
+  const output = execFileSync(
+    'cargo', ['run', '--example', 'buildinfo'],
+    { cwd: fileURLToPath(new URL('../parser', import.meta.url)) }
+  )
+  return JSON.parse(output)
+}
 
 const enums = {
   ERROR: 'Errors',
@@ -222,7 +228,7 @@ async function generateModule (profile, version, constants, loader, moduleFormat
     replaced += '\nmodule.exports = { wasmModule, noop, setup, simple }\n'
   }
 
-  return format(replaced, { ...prettierConfig, parser: 'babel' })
+  return replaced
 }
 
 function generateCommonjsPackageJson (packageJson) {
