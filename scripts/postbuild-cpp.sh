@@ -6,14 +6,9 @@ if [ $# -lt 1 ]; then
   exit 1
 fi
 
+OUTPUT_FILE="$1"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
-
-# Resolve output path to absolute (it may be relative to the caller's cwd)
-case "$1" in
-  /*) OUTPUT_FILE="$1" ;;
-  *)  OUTPUT_FILE="$PWD/$1" ;;
-esac
 
 mkdir -p "$(dirname "$OUTPUT_FILE")"
 TMPFILE=$(mktemp)
