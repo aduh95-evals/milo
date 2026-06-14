@@ -14,8 +14,10 @@ mkdir -p "$(dirname "$OUTPUT_FILE")"
 TMPFILE=$(mktemp)
 trap 'rm -f "$TMPFILE"' EXIT
 
-# Run cbindgen from the parser directory so cargo finds its vendored config
-(cd "$ROOT_DIR/parser" && cbindgen --quiet --output "$TMPFILE")
+# Run cbindgen from the parser directory so cargo finds its vendored config.
+# RUSTC_BOOTSTRAP=1 allows stable rustc to accept -Zunpretty=expanded, which
+# cbindgen needs for [parse.expand] to resolve proc-macro-generated types.
+(cd "$ROOT_DIR/parser" && RUSTC_BOOTSTRAP=1 cbindgen --quiet --output "$TMPFILE")
 
 # Extract version from parser/Cargo.toml
 VERSION=$(grep -m1 '^\s*version\s*=' "$ROOT_DIR/parser/Cargo.toml" | sed 's/.*"\([^"]*\)".*/\1/')
