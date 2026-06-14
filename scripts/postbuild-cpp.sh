@@ -1,11 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-CONFIGURATION="${1:?Usage: postbuild-cpp.sh <release|debug>}"
+if [ $# -lt 1 ]; then
+  echo "Usage: postbuild-cpp.sh <output-header-path>" >&2
+  exit 1
+fi
+
+OUTPUT_FILE="$1"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-HEADER_FILE="$ROOT_DIR/dist/cpp/$CONFIGURATION/milo.h"
+# Run cbindgen to generate the raw header
+cbindgen --quiet --output "$OUTPUT_FILE" --config "$ROOT_DIR/parser/cbindgen.toml" "$ROOT_DIR/parser"
 
 # Extract version from parser/Cargo.toml
 VERSION=$(grep -m1 '^\s*version\s*=' "$ROOT_DIR/parser/Cargo.toml" | sed 's/.*"\([^"]*\)".*/\1/')
@@ -56,8 +62,8 @@ awk -v replacement="$REPLACEMENT" '
     next
   }
   { print }
-' "$HEADER_FILE" \
+' "$OUTPUT_FILE" \
 | awk '/^$/ { blank++; if (blank <= 1) print; next } { blank = 0; print }' \
-> "${HEADER_FILE}.tmp"
+> "${OUTPUT_FILE}.tmp"
 
-mv "${HEADER_FILE}.tmp" "$HEADER_FILE"
+mv "${OUTPUT_FILE}.tmp" "$OUTPUT_FILE"
