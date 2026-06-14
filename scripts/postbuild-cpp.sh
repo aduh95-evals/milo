@@ -6,15 +6,21 @@ if [ $# -lt 1 ]; then
   exit 1
 fi
 
-OUTPUT_FILE="$1"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
+# Resolve output path to absolute (it may be relative to the caller's cwd)
+case "$1" in
+  /*) OUTPUT_FILE="$1" ;;
+  *)  OUTPUT_FILE="$PWD/$1" ;;
+esac
+
+mkdir -p "$(dirname "$OUTPUT_FILE")"
 TMPFILE=$(mktemp)
 trap 'rm -f "$TMPFILE"' EXIT
 
-# Run cbindgen to generate the raw header into a temp file
-cbindgen --quiet --output "$TMPFILE" --config "$ROOT_DIR/parser/cbindgen.toml" "$ROOT_DIR/parser"
+# Run cbindgen from the parser directory so cargo finds its vendored config
+(cd "$ROOT_DIR/parser" && cbindgen --quiet --output "$TMPFILE")
 
 # Extract version from parser/Cargo.toml
 VERSION=$(grep -m1 '^\s*version\s*=' "$ROOT_DIR/parser/Cargo.toml" | sed 's/.*"\([^"]*\)".*/\1/')
