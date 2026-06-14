@@ -10,8 +10,11 @@ OUTPUT_FILE="$1"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-# Run cbindgen to generate the raw header
-cbindgen --quiet --output "$OUTPUT_FILE" --config "$ROOT_DIR/parser/cbindgen.toml" "$ROOT_DIR/parser"
+TMPFILE=$(mktemp)
+trap 'rm -f "$TMPFILE"' EXIT
+
+# Run cbindgen to generate the raw header into a temp file
+cbindgen --quiet --output "$TMPFILE" --config "$ROOT_DIR/parser/cbindgen.toml" "$ROOT_DIR/parser"
 
 # Extract version from parser/Cargo.toml
 VERSION=$(grep -m1 '^\s*version\s*=' "$ROOT_DIR/parser/Cargo.toml" | sed 's/.*"\([^"]*\)".*/\1/')
@@ -62,8 +65,6 @@ awk -v replacement="$REPLACEMENT" '
     next
   }
   { print }
-' "$OUTPUT_FILE" \
+' "$TMPFILE" \
 | awk '/^$/ { blank++; if (blank <= 1) print; next } { blank = 0; print }' \
-> "${OUTPUT_FILE}.tmp"
-
-mv "${OUTPUT_FILE}.tmp" "$OUTPUT_FILE"
+> "$OUTPUT_FILE"
